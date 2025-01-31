@@ -15,6 +15,7 @@ outfilename = outfilename + '.json'
 data = []
 outfile = []
 full = {}
+
 with open(infilename) as f:
     for line in f:
         data.append(json.loads(line))
@@ -23,6 +24,7 @@ for source_no in range(len(data)):
     sourcename = data[source_no][0].keys()
     sourcename = sourcename[0]
     print 'Source number [', source_no + 1, '] out of [', len(data), ']'
+
     data_type = data[source_no][0][sourcename] #gives dictionary to 'tau', 'sf', or 'mod'
     mod = data_type['mod']
     tau = data_type['tau']
@@ -31,16 +33,20 @@ for source_no in range(len(data)):
     num_epochs = data_type['num_epochs']
     pos = data_type['pos']
     mod_list = []
+
     for i in range(len(mod[0])):
         string = 'mod' + repr(i)
         mod_list.append(mod[0][string])
+
     #replace NaN values in mod_list with its nearest lefthand neighbour
     lastgood = np.nanmean(mod_list)
+
     for i,value in enumerate(mod_list):
         if not np.isnan(value):
             lastgood = value
         else:
             mod_list[i] = lastgood
+            
     #apply median window filter and median absolute deviation
     filt = scipy.signal.medfilt(mod_list, 15)
     sigma = statsmodels.robust.mad(mod_list)

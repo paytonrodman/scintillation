@@ -22,6 +22,7 @@ for source_no in range(len(sfdata[0])):
     sourcename = sfdata[0][source_no][0].keys()
     sourcename = sourcename[0]
     print 'Source number [', source_no + 1, '] out of [', len(sfdata[0]), '] in sfdata'
+
     sf = sfdata[0][source_no][0][sourcename]['sf']
 
     fluxdata = json.load(open(infilename2 + sourcename + '_data.json'))
