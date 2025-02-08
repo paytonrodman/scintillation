@@ -20,23 +20,7 @@ import json
 import numpy as np
 
 def main(**kwargs):
-
-    for SF_file in glob.glob(kwargs['input_dir']+'.json'):
-        fname = SF_file.split('/')[-1]
-
-        sf_data = []
-        with open(SF_file) as f:
-            for line in f:
-                sf_data.append(json.loads(line))
-
-        source_name = sf_data.keys()
-
-
-
-
-    input_SF = kwargs['input_file']
-    infilename1 = sys.argv[1] #should be the outfile from 'calculate_sf.py' -- all files
-
+    # Get all Structure Function data
     sf_all = []
     with open(kwargs['input_file']) as f:
         for line in f:
@@ -51,6 +35,7 @@ def main(**kwargs):
 
         sf = sf_all[0][source_no][0][sourcename]['sf']
 
+        # Get flux data for source from original json
         f_data = json.load(open(kwargs['source_dir'] + sourcename + '_SF.json'))
         flux_all = []
         for freq_bin in f_data[0][sourcename]['flux'][0]:
@@ -60,6 +45,7 @@ def main(**kwargs):
         sf_all[0][source_no][0][sourcename]['av_flux'] = av_sourceflux
         rms = sf_all[0][source_no][0][sourcename]['rms_var']
 
+        # Normalise SF by two different methods (rate and sf_norm)
         for freq_num in range(len(sf[0])):
             sf_bin = sf[0][freq_num]['sf_'+repr(freq_num)]
             rms_bin = rms[0]['var_'+repr(freq_num)]
@@ -76,11 +62,13 @@ def main(**kwargs):
             subsfnorm_add = {'sfnorm_'+repr(freq_num): sf_bin_norm}
             subsfnorm.update(subsfnorm_add)
 
+        # Append normalisation to SF data
         sf_all[0][source_no][0][sourcename]['rate'] = []
         sf_all[0][source_no][0][sourcename]['rate'].append(subrate)
         sf_all[0][source_no][0][sourcename]['sf_norm'] = []
         sf_all[0][source_no][0][sourcename]['sf_norm'].append(subsfnorm)
 
+    # Output normalisation in new file
     with open(kwargs['output_dir']+'SF_normalized.', mode='w') as f:
         f.write(json.dumps(sfdata))
 
